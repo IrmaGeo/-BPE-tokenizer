@@ -18,6 +18,14 @@ def validate_input(command_args):
     except ValueError:
         print("K must be an integer")
 
+    if not os.path.isfile(train_file):
+             print ("ERROR: train file does not exist.")
+             sys.exit()
+    if not os.path.isfile(test_file):
+                 print ("ERROR: test file does not exist.")
+                 sys.exit()
+    
+
 command_args=sys.argv
 validate_input(command_args)
 
