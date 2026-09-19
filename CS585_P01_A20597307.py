@@ -1,5 +1,7 @@
 import sys
 import os
+import string
+import pandas as pd
 
 def validate_input(command_args):
     if len(command_args) != 4:
@@ -24,8 +26,39 @@ def validate_input(command_args):
     if not os.path.isfile(test_file):
                  print ("ERROR: test file does not exist.")
                  sys.exit()
+
+def clean_train_file(file, initial_V):
+      # read file
+      # remove all punctuation
+      # remove all non-printable characters other than space
+      # remove other characters that are NOT in the INITIAL Vocabulary V
+
+      return #cleaned text
+
+def train_bpe(train_text, k, initial_V):
+      # add the stop token character to your vocabulary
+      # train your BPE Learner by performing K merges
+      return # return final vocabulary final_V
     
-command_args=sys.argv
+command_args = sys.argv
 validate_input(command_args)
+
+# Command-line parameters
+k = int(command_args[1])
+train_file = command_args[2]
+test_file = command_args[3]
+
+# Initial vocabulary V:
+# all uppercase and lowercase letters in the English alphabet
+initial_V =set(string.ascii_letters)
+
+# Read and clean training data
+train_text = clean_train_file(train_file, initial_V)
+
+# Train BPE model
+final_V = train_bpe(train_text, k, initial_V)
+
+
+
 
 
