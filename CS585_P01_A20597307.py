@@ -12,9 +12,9 @@ def validate_input(command_args):
     try:
         k = int(k)
 
-        # K must be a positive integer
-        if k <= 0:
-            print("K is out of range.")
+        # K must be 5
+        if k != 5:
+            print("K must be 5")
     except ValueError:
         print("K must be an integer")
 
@@ -25,7 +25,6 @@ def validate_input(command_args):
                  print ("ERROR: test file does not exist.")
                  sys.exit()
     
-
 command_args=sys.argv
 validate_input(command_args)
 
