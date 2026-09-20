@@ -15,7 +15,7 @@ def validate_input(command_args):
         k = int(k)
 
         # If the K argument is out of the specified range, assume that the value for K is 5 
-        if k not in (50, 100, 150, 200):
+        if k <=0:
            k=5
     except ValueError:
         k=5
@@ -28,7 +28,7 @@ def validate_input(command_args):
                  sys.exit()
     return k,train_file, test_file
 
-def clean_file(file, initial_V):
+def clean_file(file, initial_v):
 
     # read file
     with open(file, 'r') as input_file:
@@ -40,7 +40,7 @@ def clean_file(file, initial_V):
 
     cln_cnt=""
     for ch_index in range(len(cnt)):
-        if (cnt[ch_index] in initial_V or cnt[ch_index]== " ") and cnt[ch_index] not in string.punctuation and cnt[ch_index] in string.printable:
+        if (cnt[ch_index] in initial_v or cnt[ch_index]== " ") and cnt[ch_index] not in string.punctuation and cnt[ch_index] in string.printable:
             cln_cnt=cln_cnt+cnt[ch_index]
    
     return cln_cnt
@@ -49,6 +49,7 @@ def build_corpus(text):
     words = text.split()
     corpus = []
 
+    # add the stop token character end of the each word
     for word in words:
         tokens = list(word)
         tokens.append("_")
@@ -71,9 +72,9 @@ def merge_pair(corpus, rule):
 
     return corpus
 
-def train_bpe(train_text, k, initial_V):
+def train_bpe(train_text, k, initial_v):
     # add the stop token character to the vocabulary
-    final_v = initial_V.copy()
+    final_v = initial_v.copy()
     final_v.add("_")
     vocab_order = list(string.ascii_letters)
     vocab_order.append("_")
@@ -119,12 +120,12 @@ def train_bpe(train_text, k, initial_V):
                 max_count = pair_counts[pair]
                 new_token = pair
 
-        merge_rules.append(new_token)
+            merge_rules.append(new_token)
 
-        # step 6: add merged token to final_v
-        merged_token = ''.join(new_token)
-        final_v.add(merged_token)
-        vocab_order.append(merged_token)
+            # step 6: add merged token to final_v
+            merged_token = ''.join(new_token)
+            final_v.add(merged_token)
+            vocab_order.append(merged_token)
 
         # step 7: merge that pair everywhere
         corpus = merge_pair(corpus, new_token)
@@ -137,60 +138,65 @@ def tokenized_data(text, rules):
         corpus = merge_pair(corpus, rule)
     return corpus
 
-     
-command_args = sys.argv
-k,train_file, test_file =validate_input(command_args)
-initial_V =set(string.ascii_letters)
-train_text = clean_file(train_file, initial_V)
-training_start = time.perf_counter()
-final_v, merge_rules, vocab_order = train_bpe(train_text, k, initial_V)
-training_end = time.perf_counter()
-training_time = training_end - training_start
+def save_results(vocab_order, result_tokens):
 
-cleaned_test_text=clean_file(test_file, initial_V)
+    with open("CS585_P01_A20597307_VOCAB.txt", "w") as vocab_file:
+        for token in vocab_order:
+            vocab_file.write(token + "\n")
 
-tokenization_start = time.perf_counter()
+    with open("CS585_P01_A20597307_RESULT.txt", "w") as result_file:
+        result_file.write(" ".join(result_tokens))
 
-tokenized_test_text=tokenized_data(cleaned_test_text, merge_rules)
+def print_output(k, train_file, test_file,
+                 training_time, tokenization_time, result_tokens):
 
-tokenization_end = time.perf_counter()
-tokenization_time = tokenization_end - tokenization_start
+    print("Modzgvrishvili, Irma, A20597307 solution:")
+    print("Number of merges:", k)
+    print("Training file name:", train_file)
+    print("Test file name:", test_file)
+    print("Training time:", training_time)
+    print("Tokenization time:", tokenization_time)
 
-with open("CS585_P01_A20597307_VOCAB.txt", "w") as vocab_file:
-    for token in vocab_order:
-        vocab_file.write(token + "\n")
-with open("CS585_P01_A20597307_RESULT.txt", "w") as result_file:
+    if len(result_tokens) > 20:
+        print("Tokenization result:", " ".join(result_tokens[:20]))
+        print("Tokenized text is longer than 20 tokens")
+    else:
+        print("Tokenization result:", " ".join(result_tokens))
+
+def main():
+    command_args = sys.argv
+    k, train_file, test_file = validate_input(command_args)
+
+    initial_v = set(string.ascii_letters)
+
+    train_text = clean_file(train_file, initial_v)
+
+    training_start = time.perf_counter()
+    final_v, merge_rules, vocab_order = train_bpe(train_text, k, initial_v)
+    training_time = time.perf_counter() - training_start
+
+    cleaned_test_text = clean_file(test_file, initial_v)
+
+    tokenization_start = time.perf_counter()
+    tokenized_test_text = tokenized_data(cleaned_test_text, merge_rules)
+    tokenization_time = time.perf_counter() - tokenization_start
+
     result_tokens = []
 
     for word in tokenized_test_text:
         for token in word:
             result_tokens.append(token)
 
-    result_file.write(" ".join(result_tokens))
+    save_results(vocab_order, result_tokens)
 
-
-# output
-print("Modzgvrishvili, Irma, A20597307 solution:")
-print("Number of merges: ", k)
-print("Training file name: ", train_file)
-print("Test file name: ", test_file)
-
-
-# Training time: yyy seconds
-print ("Training time:" ,training_time)
-# Tokenization time: zzz seconds
-print ("Tokenization time:" ,tokenization_time)
-
-
-# Tokenization result: <tokenization result here>
-if len(result_tokens) > 20:
-    print("Tokenization result:", " ".join(result_tokens[:20]))
-    print("Tokenized text is longer than 20 tokens")
-else:
-    print("Tokenization result:", " ".join(result_tokens))
-
-
-
-
-
-
+    print_output(
+        k,
+        train_file,
+        test_file,
+        training_time,
+        tokenization_time,
+        result_tokens
+    )
+ 
+if __name__ == "__main__":
+    main()
