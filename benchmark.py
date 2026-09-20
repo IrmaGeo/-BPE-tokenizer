@@ -19,7 +19,7 @@ TRAIN_SIZES = [500, 1000, 1500, 2000]
 REPETITIONS = 5
 
 PROGRAM = "CS585_P01_A20597307.py"
-TEST_FILE = "test.txt"
+TEST_FILE = "data/test.txt"
 
 results = []
 
