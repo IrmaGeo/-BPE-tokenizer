@@ -197,7 +197,7 @@ A separate analysis script runs the tokenizer for multiple values of `K` and tra
 Suggested file name:
 
 ```text
-analyse.py
+benchmark.py
 ```
 
 ## Experiment Settings
@@ -225,7 +225,7 @@ Total runs:
 ## Run the Analysis
 
 ```bash
-python analyse.py
+python benchmark.py
 ```
 
 The analysis script automatically runs the main BPE program for all combinations.
@@ -279,23 +279,31 @@ If these packages are unavailable, the CSV benchmark results are still generated
 ## Example Project Structure
 
 ```text
--BPE-tokenizer/
+bpe-tokenizer/
 │
-├── CS585_P01_A20597307.py
-├── analyse.py
+├── bpe/
+│   ├── __init__.py
+│   ├── preprocessing.py
+│   ├── core.py
+│   ├── learner.py
+│   └── segmenter.py
+│
+├── main.py
+├── benchmark.py
 ├── README.md
 │
-├── TRAIN_500.txt
-├── TRAIN_1000.txt
-├── TRAIN_1500.txt
-├── TRAIN_2000.txt
-├── test.txt
+├── data/
+│   ├── train_500.txt
+│   ├── train_1000.txt
+│   ├── train_1500.txt
+│   ├── train_2000.txt
+│   └── test.txt
 │
-├── CS585_P01_A20597307_VOCAB.txt
-├── CS585_P01_A20597307_RESULT.txt
-├── BPE_ANALYSIS.csv
-├── bpe_summary_table.png
-└── bpe_training_time.png
+└── results/
+    ├── vocabulary.txt
+    ├── tokenized_result.txt
+    ├── bpe_analysis.csv
+    └── plots/
 ```
 
 ## Notes
