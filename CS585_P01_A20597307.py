@@ -38,26 +38,46 @@ def clean_file(file, initial_V):
     # remove other characters that are NOT in the INITIAL Vocabulary V
 
     cln_cnt=""
-    for ch in range(len(cnt)):
-        if (cnt[ch] in initial_V or cnt[ch]== " ") and cnt[ch] not in string.punctuation and cnt[ch] in string.printable:
-            cln_cnt=cln_cnt+cnt[ch]
+    for ch_index in range(len(cnt)):
+        if (cnt[ch_index] in initial_V or cnt[ch_index]== " ") and cnt[ch_index] not in string.punctuation and cnt[ch_index] in string.printable:
+            cln_cnt=cln_cnt+cnt[ch_index]
    
     return cln_cnt
+
+def build_corpus(text):
+    words = text.split()
+    corpus = []
+
+    for word in words:
+        tokens = list(word)
+        tokens.append("_")
+        corpus.append(tokens)
+
+    return corpus
+
+def merge_pair(corpus, rule):
+    merged_token = ''.join(rule)
+
+    for word in corpus:
+        token_index = 0
+
+        while token_index < len(word) - 1:
+            if (word[token_index], word[token_index + 1]) == rule:
+                word[token_index] = merged_token
+                del word[token_index + 1]
+
+            token_index += 1
+
+    return corpus
 
 def train_bpe(train_text, k, initial_V):
     # add the stop token character to the vocabulary
     final_v = initial_V.copy()
     final_v.add("_")
 
-    # step 1: split words by space
-    words = train_text.split()
-    corpus = []
+    # step 1: build corpus
+    corpus=build_corpus(train_text)
 
-    # step 2: for each word add stop token at the end
-    for word in words:
-        tokens = list(word)
-        tokens.append("_")
-        corpus.append(tokens)
     merge_rules = []
 
     # perform K merges
@@ -81,7 +101,6 @@ def train_bpe(train_text, k, initial_V):
 
         # step 4: count each pair
         pair_counts = {}
-        
 
         for pair in pairs:
             if pair in pair_counts:
@@ -96,6 +115,7 @@ def train_bpe(train_text, k, initial_V):
             if max_count < pair_counts[pair]:
                 max_count = pair_counts[pair]
                 new_token = pair
+
         merge_rules.append(new_token)
 
         # step 6: add merged token to final_v
@@ -103,19 +123,16 @@ def train_bpe(train_text, k, initial_V):
         final_v.add(merged_token)
 
         # step 7: merge that pair everywhere
-        for word in corpus:
-            i = 0
-
-            while i < len(word) - 1:
-                if (word[i], word[i + 1]) == new_token:
-                    word[i] = merged_token
-                    del word[i + 1]
-
-                i += 1
+        corpus = merge_pair(corpus, new_token)
 
     return final_v, merge_rules
-    
 
+def tokenized_data(text, rules):
+    corpus=build_corpus(text)
+    for rule in rules:
+        corpus = merge_pair(corpus, rule)
+    return corpus
+     
 # Command-line parameters
 command_args = sys.argv
 k,train_file, test_file =validate_input(command_args)
@@ -131,8 +148,8 @@ train_text = clean_file(train_file, initial_V)
 # Train BPE model
 final_v, merge_rules = train_bpe(train_text, k, initial_V)
 cleaned_test_text=clean_file(test_file, initial_V)
-print("final vocabulary",final_v)
-print("merge rule", merge_rules)
+tokenized_test_text=tokenized_data(cleaned_test_text, merge_rules)
+
 
 
 # output
@@ -144,7 +161,9 @@ print("Test file name: ", test_file)
 
 # Training time: yyy seconds
 # Tokenization time: zzz seconds
+
 # Tokenization result: <tokenization result here>
+print(tokenized_test_text)
 
 
 
