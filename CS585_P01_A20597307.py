@@ -46,8 +46,13 @@ def clean_train_file(file, initial_V):
 
 def train_bpe(train_text, k, initial_V):
       # add the stop token character to your vocabulary
+
+    final_V = initial_V.copy()
+    final_V.add("_")
+
       # train your BPE Learner by performing K merges
-      return # return final vocabulary final_V
+      
+    return final_V
     
 command_args = sys.argv
 validate_input(command_args)
@@ -66,7 +71,20 @@ initial_V =set(string.ascii_letters)
 train_text = clean_train_file(train_file, initial_V)
 
 # Train BPE model
-# final_V = train_bpe(train_text, k, initial_V)
+final_V = train_bpe(train_text, k, initial_V)
+print(final_V)
+
+# output
+print("Modzgvrishvili, Irma, A20597307 solution:")
+print("Number of merges: ", k)
+print("Training file name: ", train_file)
+print("Test file name: ", test_file)
+
+
+# Training time: yyy seconds
+# Tokenization time: zzz seconds
+# Tokenization result: <tokenization result here>
+
 
 
 
