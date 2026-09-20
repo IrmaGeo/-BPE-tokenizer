@@ -28,12 +28,21 @@ def validate_input(command_args):
                  sys.exit()
 
 def clean_train_file(file, initial_V):
-      # read file
-      # remove all punctuation
-      # remove all non-printable characters other than space
-      # remove other characters that are NOT in the INITIAL Vocabulary V
 
-      return #cleaned text
+    # read file
+    with open(file, 'r') as input_file:
+        cnt = input_file.read()
+
+    # remove all punctuation
+    cln_cnt=""
+    for i in range(len(cnt)):
+        if cnt[i] not in string.punctuation:
+            cln_cnt=cln_cnt+cnt[i]
+
+    # remove all non-printable characters other than space
+    # remove other characters that are NOT in the INITIAL Vocabulary V
+
+    return cln_cnt
 
 def train_bpe(train_text, k, initial_V):
       # add the stop token character to your vocabulary
@@ -48,6 +57,7 @@ k = int(command_args[1])
 train_file = command_args[2]
 test_file = command_args[3]
 
+
 # Initial vocabulary V:
 # all uppercase and lowercase letters in the English alphabet
 initial_V =set(string.ascii_letters)
@@ -56,7 +66,7 @@ initial_V =set(string.ascii_letters)
 train_text = clean_train_file(train_file, initial_V)
 
 # Train BPE model
-final_V = train_bpe(train_text, k, initial_V)
+# final_V = train_bpe(train_text, k, initial_V)
 
 
 
