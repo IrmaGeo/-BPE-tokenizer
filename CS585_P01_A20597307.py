@@ -34,14 +34,14 @@ def clean_train_file(file, initial_V):
         cnt = input_file.read()
 
     # remove all punctuation
-    cln_cnt=""
-    for i in range(len(cnt)):
-        if cnt[i] not in string.punctuation:
-            cln_cnt=cln_cnt+cnt[i]
-
     # remove all non-printable characters other than space
     # remove other characters that are NOT in the INITIAL Vocabulary V
 
+    cln_cnt=""
+    for i in range(len(cnt)):
+        if (cnt[i] in initial_V or cnt[i]== " ") and cnt[i] not in string.punctuation and cnt[i] in string.printable:
+            cln_cnt=cln_cnt+cnt[i]
+   
     return cln_cnt
 
 def train_bpe(train_text, k, initial_V):
