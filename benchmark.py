@@ -1,3 +1,10 @@
+"""
+benchmark.py
+------------
+Executes grid experiments across K merge counts and training set sizes,
+logging average timings and generating performance plots in results/.
+"""
+
 import subprocess
 import re
 import csv
@@ -14,12 +21,21 @@ except ImportError:
     HAS_PLOT_LIBS = False
     print("Notice: 'pandas' or 'matplotlib' not installed. CSV will be generated, but table/chart images will be skipped.")
 
+# Benchmark settings
 K_VALUES = [50, 100, 150, 200]
 TRAIN_SIZES = [500, 1000, 1500, 2000]
 REPETITIONS = 5
 
-PROGRAM = "CS585_P01_A20597307.py"
-TEST_FILE = "data/test.txt"
+# Directory paths
+PROGRAM = "main.py"
+DATA_DIR = "data"
+RESULTS_DIR = "results"
+PLOTS_DIR = os.path.join(RESULTS_DIR, "plots")
+TEST_FILE = os.path.join(DATA_DIR, "test.txt")
+
+# Ensure results and plots output directories exist
+os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
 results = []
 
@@ -27,11 +43,11 @@ print("Starting benchmark runs...")
 
 for k in K_VALUES:
     for train_size in TRAIN_SIZES:
-        train_file = f"TRAIN_{train_size}.txt"
+        train_file = os.path.join(DATA_DIR, f"train_{train_size}.txt")
 
-        # Skip if training file doesn't exist yet
+        # Skip if training file doesn't exist inside data/
         if not os.path.exists(train_file):
-            print(f"Skipping: {train_file} not found.")
+            print(f"Skipping: '{train_file}' not found.")
             continue
 
         training_times = []
@@ -52,6 +68,7 @@ for k in K_VALUES:
 
             output = process.stdout
 
+            # Match floating-point execution times from main.py console output
             training_match = re.search(r"Training time:\s*([0-9.eE+-]+)", output)
             tokenization_match = re.search(r"Tokenization time:\s*([0-9.eE+-]+)", output)
 
@@ -73,9 +90,9 @@ for k in K_VALUES:
         else:
             print(f"Warning: Could not extract timing metrics for K={k}, Size={train_size}")
 
-# 1. Save results to CSV file
-csv_filename = "BPE_ANALYSIS.csv"
-with open(csv_filename, "w", newline="") as file:
+# 1. Save benchmark metrics to CSV file inside results/
+csv_filename = os.path.join(RESULTS_DIR, "bpe_analysis.csv")
+with open(csv_filename, "w", newline="", encoding="utf-8") as file:
     fieldnames = ["k", "train_size", "avg_training_time", "avg_tokenization_time"]
     writer = csv.DictWriter(file, fieldnames=fieldnames)
     writer.writeheader()
@@ -83,7 +100,7 @@ with open(csv_filename, "w", newline="") as file:
 
 print(f"\nAnalysis finished. Raw data saved to '{csv_filename}'.")
 
-# 2. Render and save Table View + Plot Images if libraries are available
+# 2. Render and save Table View + Plot Images if visualization libraries are available
 if HAS_PLOT_LIBS and results:
     df = pd.DataFrame(results)
 
@@ -117,10 +134,11 @@ if HAS_PLOT_LIBS and results:
             cell.get_text().set_color('white')
             cell.get_text().set_weight('bold')
 
+    summary_table_path = os.path.join(PLOTS_DIR, "bpe_summary_table.png")
     plt.title("BPE Performance Benchmark Summary Table", fontsize=12, fontweight='bold', pad=15)
-    plt.savefig("bpe_summary_table.png", bbox_inches='tight', dpi=300)
+    plt.savefig(summary_table_path, bbox_inches='tight', dpi=300)
     plt.close()
-    print("Table view saved to 'bpe_summary_table.png'.")
+    print(f"Table view saved to '{summary_table_path}'.")
 
     # --- SAVE TRAINING TIME PLOT ---
     plt.figure(figsize=(8, 5))
@@ -134,6 +152,8 @@ if HAS_PLOT_LIBS and results:
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig('bpe_training_time.png', dpi=300)
+    
+    chart_path = os.path.join(PLOTS_DIR, "bpe_training_time.png")
+    plt.savefig(chart_path, dpi=300)
     plt.close()
-    print("Chart saved to 'bpe_training_time.png'.")
+    print(f"Chart saved to '{chart_path}'.")
