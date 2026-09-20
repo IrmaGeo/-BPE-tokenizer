@@ -103,31 +103,21 @@ def train_bpe(train_text, k, initial_v):
         if not pairs:
             break
 
-        # step 4: count each pair
+        # Step 4: Count pair frequencies
         pair_counts = {}
-
         for pair in pairs:
-            if pair in pair_counts:
-                pair_counts[pair] += 1
-            else:
-                pair_counts[pair] = 1
+            pair_counts[pair] = pair_counts.get(pair, 0) + 1
 
-        # step 5: choose first max(count(pair))
-        max_count = 0
+        # Step 5: Safely pick the pair with maximum frequency
+        new_token = max(pair_counts, key=pair_counts.get)
 
-        for pair in pair_counts:
-            if max_count < pair_counts[pair]:
-                max_count = pair_counts[pair]
-                new_token = pair
+        # Step 6: Record the single winning pair
+        merge_rules.append(new_token)
+        merged_token = ''.join(new_token)
+        final_v.add(merged_token)
+        vocab_order.append(merged_token)
 
-            merge_rules.append(new_token)
-
-            # step 6: add merged token to final_v
-            merged_token = ''.join(new_token)
-            final_v.add(merged_token)
-            vocab_order.append(merged_token)
-
-        # step 7: merge that pair everywhere
+        # Step 7: Merge that winning pair across the corpus
         corpus = merge_pair(corpus, new_token)
 
     return final_v, merge_rules, vocab_order
