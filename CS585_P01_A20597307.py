@@ -51,16 +51,19 @@ def train_bpe(train_text, k, initial_V):
     final_V.add("_")
 
     # step 1: split words by space
-    corpus=train_text.split()
+    words=train_text.split()
+    corpus=[]
 
     # step 2: for each word add stop token at the end
-    suffix="_"
-    for i in range(len(corpus)):
-         corpus[i]=str(corpus[i])+suffix
-    
+
+    for word in words:
+        tokens = list(word)
+        tokens.append("_")
+        corpus.append(tokens)
+
 
     # for each i in range(k):
-    
+
     # step 3: create adjacent pairs from current tokenized words
     pairs=[]
     for i in range(len(corpus)):
@@ -88,9 +91,16 @@ def train_bpe(train_text, k, initial_V):
 
     merged_token = ''.join(new_token)
     final_V.add(merged_token)
+   
 
     # step 7: merge that pair everywhere
-
+    for word in corpus:
+        i=0
+        while i < len(word) - 1:
+            if word[i]+word[i+1]== merged_token:
+                word[i]=merged_token
+                del word[i+1]
+            i+=1                 
       
     return final_V
     
@@ -112,7 +122,6 @@ train_text = clean_train_file(train_file, initial_V)
 
 # Train BPE model
 final_V = train_bpe(train_text, k, initial_V)
-# print(final_V)
 
 # output
 print("Modzgvrishvili, Irma, A20597307 solution:")
