@@ -74,6 +74,8 @@ def train_bpe(train_text, k, initial_V):
     # add the stop token character to the vocabulary
     final_v = initial_V.copy()
     final_v.add("_")
+    vocab_order = list(string.ascii_letters)
+    vocab_order.append("_")
 
     # step 1: build corpus
     corpus=build_corpus(train_text)
@@ -121,35 +123,34 @@ def train_bpe(train_text, k, initial_V):
         # step 6: add merged token to final_v
         merged_token = ''.join(new_token)
         final_v.add(merged_token)
+        vocab_order.append(merged_token)
 
         # step 7: merge that pair everywhere
         corpus = merge_pair(corpus, new_token)
 
-    return final_v, merge_rules
+    return final_v, merge_rules, vocab_order
 
 def tokenized_data(text, rules):
     corpus=build_corpus(text)
     for rule in rules:
         corpus = merge_pair(corpus, rule)
     return corpus
+
      
-# Command-line parameters
 command_args = sys.argv
 k,train_file, test_file =validate_input(command_args)
-
-
-# Initial vocabulary V:
-# all uppercase and lowercase letters in the English alphabet
 initial_V =set(string.ascii_letters)
-
-# Read and clean training data
 train_text = clean_file(train_file, initial_V)
-
-# Train BPE model
-final_v, merge_rules = train_bpe(train_text, k, initial_V)
+final_v, merge_rules, vocab_order = train_bpe(train_text, k, initial_V)
 cleaned_test_text=clean_file(test_file, initial_V)
 tokenized_test_text=tokenized_data(cleaned_test_text, merge_rules)
 
+with open("CS585_P01_A20597307_VOCAB.txt", "w") as vocab_file:
+    for token in vocab_order:
+        vocab_file.write(token + "\n")
+with open("CS585_P01_A20597307_RESULT.txt", "w") as result_file:
+    for word in tokenized_test_text:
+        result_file.write(" ".join(word) + "\n")
 
 
 # output
