@@ -51,14 +51,34 @@ def train_bpe(train_text, k, initial_V):
     final_V.add("_")
 
     # step 1: split words by space
-    # step 2: for each word add stop token at the end
+    corpus=train_text.split()
 
-        # for each i in range(k):
-            # step 3: create adjacent pairs from current tokenized words
-            # step 4: count each pair
-            # step 5: choose first max(count(pair)) using tie-break rule
-            # step 6: add merged token to final_V
-            # step 7: merge that pair everywhere
+    # step 2: for each word add stop token at the end
+    suffix="_"
+    for i in range(len(corpus)):
+         corpus[i]=str(corpus[i])+suffix
+    
+
+    # for each i in range(k):
+        # step 3: create adjacent pairs from current tokenized words
+    pairs=[]
+    for i in range(len(corpus)):
+        for j in range(len(corpus[i])-1):
+            pairs.append((corpus[i][j], corpus[i][j + 1]))
+               
+    # step 4: count each pair
+    pair_counts={}
+    for pair in pairs:
+        if pair in pair_counts:
+            pair_counts[pair]+=1
+        else:
+            pair_counts[pair] = 1
+    print(pair_counts)
+        
+
+    # step 5: choose first max(count(pair)) using tie-break rule
+    # step 6: add merged token to final_V
+    # step 7: merge that pair everywhere
 
       
     return final_V
