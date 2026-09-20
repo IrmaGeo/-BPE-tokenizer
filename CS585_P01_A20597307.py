@@ -45,12 +45,21 @@ def clean_train_file(file, initial_V):
     return cln_cnt
 
 def train_bpe(train_text, k, initial_V):
-      # add the stop token character to your vocabulary
+    # add the stop token character to your vocabulary
 
     final_V = initial_V.copy()
     final_V.add("_")
 
-      # train your BPE Learner by performing K merges
+    # step 1: split words by space
+    # step 2: for each word add stop token at the end
+
+        # for each i in range(k):
+            # step 3: create adjacent pairs from current tokenized words
+            # step 4: count each pair
+            # step 5: choose first max(count(pair)) using tie-break rule
+            # step 6: add merged token to final_V
+            # step 7: merge that pair everywhere
+
       
     return final_V
     
@@ -72,7 +81,7 @@ train_text = clean_train_file(train_file, initial_V)
 
 # Train BPE model
 final_V = train_bpe(train_text, k, initial_V)
-print(final_V)
+# print(final_V)
 
 # output
 print("Modzgvrishvili, Irma, A20597307 solution:")
