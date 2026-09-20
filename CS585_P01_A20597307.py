@@ -183,7 +183,11 @@ print ("Tokenization time:" ,tokenization_time)
 
 
 # Tokenization result: <tokenization result here>
-print(tokenized_test_text)
+if len(result_tokens) > 20:
+    print("Tokenization result:", " ".join(result_tokens[:20]))
+    print("Tokenized text is longer than 20 tokens")
+else:
+    print("Tokenization result:", " ".join(result_tokens))
 
 
 
