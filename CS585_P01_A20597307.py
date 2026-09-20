@@ -1,6 +1,7 @@
 import sys
 import os
 import string
+import time
 
 def validate_input(command_args):
     if len(command_args) != 4:
@@ -141,16 +142,31 @@ command_args = sys.argv
 k,train_file, test_file =validate_input(command_args)
 initial_V =set(string.ascii_letters)
 train_text = clean_file(train_file, initial_V)
+training_start = time.perf_counter()
 final_v, merge_rules, vocab_order = train_bpe(train_text, k, initial_V)
+training_end = time.perf_counter()
+training_time = training_end - training_start
+
 cleaned_test_text=clean_file(test_file, initial_V)
+
+tokenization_start = time.perf_counter()
+
 tokenized_test_text=tokenized_data(cleaned_test_text, merge_rules)
+
+tokenization_end = time.perf_counter()
+tokenization_time = tokenization_end - tokenization_start
 
 with open("CS585_P01_A20597307_VOCAB.txt", "w") as vocab_file:
     for token in vocab_order:
         vocab_file.write(token + "\n")
 with open("CS585_P01_A20597307_RESULT.txt", "w") as result_file:
+    result_tokens = []
+
     for word in tokenized_test_text:
-        result_file.write(" ".join(word) + "\n")
+        for token in word:
+            result_tokens.append(token)
+
+    result_file.write(" ".join(result_tokens))
 
 
 # output
@@ -161,7 +177,10 @@ print("Test file name: ", test_file)
 
 
 # Training time: yyy seconds
+print ("Training time:" ,training_time)
 # Tokenization time: zzz seconds
+print ("Tokenization time:" ,tokenization_time)
+
 
 # Tokenization result: <tokenization result here>
 print(tokenized_test_text)

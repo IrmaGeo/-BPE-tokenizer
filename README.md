@@ -1,6 +1,6 @@
 # -BPE-tokenizer
 Implement the BPE tokenizer and apply it to tokenize text
 
-python CS585_P01_A20597307.py 2 train.txt test.txt
+python CS585_P01_A20597307.py 50 train.txt test.txt
 
 
